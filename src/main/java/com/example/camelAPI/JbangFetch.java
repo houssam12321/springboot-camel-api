@@ -1,4 +1,5 @@
 package com.example.camelAPI;
+import org.apache.camel.builder.RouteBuilder;
 
 //DEPS org.apache.camel:camel-main:4.0.0
 //DEPS org.apache.camel:camel-http:4.0.0
@@ -8,21 +9,12 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
 
-public class JbangFetch {
-    public static void main(String[] args) throws Exception {
-        CamelContext context = new DefaultCamelContext();
+public class JbangFetch extends RouteBuilder {
+    @Override
+    public void configure() {
+        from("timer:fetch?period=20000")  // Fetch every 10 sec
+                .to("https://fakestoreapi.com/products")  // API call
 
-        context.addRoutes(new RouteBuilder() {
-            @Override
-            public void configure() {
-                from("timer:fetch?period=10000") // Fetch every 10 sec
-                        .to("http4://fakestoreapi.com/products")
-                        .log("Fetched Products: ${body}");
-            }
-        });
-
-        context.start();
-        Thread.sleep(30000); // Keep running
-        context.stop();
+                .log("Formatted Products:\n${body}");  // ✅ Display formatted output
     }
 }
